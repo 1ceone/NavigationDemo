@@ -58,8 +58,8 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    implementation(libs.androidx.navigation3.runtime)
-    implementation(libs.androidx.navigation3.ui)
+    implementation("androidx.navigation:navigation-compose:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.serialization.json)
 }

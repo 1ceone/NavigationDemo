@@ -7,17 +7,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.navigationdemo.ui.theme.NavigationDemoTheme
-import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.entry
-import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.ui.NavDisplay
 import com.example.navigationdemo.screens.*
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,33 +35,43 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen(modifier: Modifier = Modifier) {
-    val backStack = rememberNavBackStack(HomeScreen)
-    val onNavigation: (NavKey) -> Unit = {
-        backStack.add(it)
-    }
-    val onClearBackStack: () -> Unit = {
-        while (backStack.size > 1) {
-            backStack.removeLastOrNull()
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = "home",
+        modifier = modifier
+    ) {
+        composable("home") {
+            Home(
+                onNavigateToWelcome = { name ->
+                    navController.navigate("welcome/$name")
+                },
+                onNavigateToProfile = {
+                    navController.navigate("profile")
+                }
+            )
+        }
+        composable("welcome/{name}") { backStackEntry ->
+            val name = backStackEntry.arguments?.getString("name") ?: "Guest"
+            Welcome(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToProfile = { navController.navigate("profile") },
+                name = name
+            )
+        }
+        composable("profile") {
+            Profile(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToHome = {
+                    // Очистка стека и переход на home
+                    navController.popBackStack("home", inclusive = false)
+                }
+            )
         }
     }
-    NavDisplay(
-        backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
-        entryProvider = entryProvider {
-            entry<HomeScreen> {
-                Home(onNavigation)
-            }
-            entry<WelcomeScreen>(
-                metadata = mapOf("extraDataKey" to "extraDataValue")
-            ) { key ->
-                Welcome(onNavigation, key.name)
-            }
-            entry<ProfileScreen> {
-                Profile(onClearBackStack)
-            }
-        }
-    )
 }
+
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {

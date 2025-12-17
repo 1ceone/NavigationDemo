@@ -1,5 +1,6 @@
 package com.example.navigationdemo.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,24 +13,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+
 @Composable
-fun Profile(onClearBackStack: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize(),
-        contentAlignment = Alignment.Center
+fun Profile(
+    onNavigateBack: () -> Unit,
+    onNavigateToHome: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                "Setup your profile",
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Spacer(modifier = Modifier.size(30.dp))
-            Button(onClick = {
-                onClearBackStack()
-            }) {
-                Text(text = "Go Home")
-            }
+        Text("Profile Screen")
+        Button(onClick = onNavigateBack) {
+            Text("Back")
+        }
+        Button(onClick = onNavigateToHome) {
+            Text("Go to Home (Clear Back Stack)")
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.navigationdemo.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,27 +13,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation3.runtime.NavKey
 import com.example.navigationdemo.ProfileScreen
 
 @Composable
-fun Welcome(onNavigation: (NavKey) -> Unit, name: String = "") {
-    Box(
-        modifier = Modifier
-            .fillMaxSize(),
-        contentAlignment = Alignment.Center
+fun Welcome(
+    onNavigateBack: () -> Unit,
+    onNavigateToProfile: () -> Unit,
+    name: String
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                "Welcome $name",
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Spacer(modifier = Modifier.size(30.dp))
-            Button(onClick = {
-                onNavigation(ProfileScreen)
-            }) {
-                Text(text = "Set up your Profile")
-            }
+        Text("Welcome, $name!")
+        Button(onClick = onNavigateBack) {
+            Text("Back")
+        }
+        Button(onClick = onNavigateToProfile) {
+            Text("Go to Profile")
         }
     }
 }
