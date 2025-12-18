@@ -3,30 +3,32 @@ package com.example.navigationdemo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.navigationdemo.ui.theme.NavigationDemoTheme
-import com.example.navigationdemo.screens.*
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             NavigationDemoTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MainScreen(
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AppNavigation()
                 }
             }
         }
@@ -34,50 +36,76 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
+fun AppNavigation() {
     val navController = rememberNavController()
 
     NavHost(
         navController = navController,
-        startDestination = "home",
-        modifier = modifier
+        startDestination = Routes.HOME
     ) {
-        composable("home") {
-            Home(
+        composable(Routes.HOME) {
+            HomeScreen(
                 onNavigateToWelcome = { name ->
+                    // Переход на WelcomeScreen с параметром
                     navController.navigate("welcome/$name")
                 },
                 onNavigateToProfile = {
-                    navController.navigate("profile")
+                    navController.navigate(Routes.PROFILE)
                 }
             )
         }
-        composable("welcome/{name}") { backStackEntry ->
-            val name = backStackEntry.arguments?.getString("name") ?: "Guest"
-            Welcome(
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToProfile = { navController.navigate("profile") },
-                name = name
+
+        composable(Routes.WELCOME) { backStackEntry ->
+            // Извлекаем параметр из маршрута
+            val name = backStackEntry.arguments?.getString("name") ?: "Гость"
+            WelcomeScreen(
+                name = name,
+                onNavigateBack = { navController.popBackStack() }
             )
         }
-        composable("profile") {
-            Profile(
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToHome = {
-                    // Очистка стека и переход на home
-                    navController.popBackStack("home", inclusive = false)
-                }
+
+        composable(Routes.PROFILE) {
+            ProfileScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
     }
 }
 
-@Preview(showBackground = true)
+// Примеры экранов (должны быть в отдельных файлах)
 @Composable
-fun MainScreenPreview() {
-    NavigationDemoTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            MainScreen(modifier = Modifier.padding(innerPadding))
+fun HomeScreen(
+    onNavigateToWelcome: (String) -> Unit,
+    onNavigateToProfile: () -> Unit
+) {
+    Column {
+        Text("Home Screen")
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { onNavigateToWelcome("User") }) {
+            Text("Go to Welcome")
+        }
+        Button(onClick = onNavigateToProfile) {
+            Text("Go to Profile")
+        }
+    }
+}
+
+@Composable
+fun WelcomeScreen(name: String, onNavigateBack: () -> Unit) {
+    Column {
+        Text("Welcome, $name!")
+        Button(onClick = onNavigateBack) {
+            Text("Back")
+        }
+    }
+}
+
+@Composable
+fun ProfileScreen(onNavigateBack: () -> Unit) {
+    Column {
+        Text("Profile Screen")
+        Button(onClick = onNavigateBack) {
+            Text("Back")
         }
     }
 }
